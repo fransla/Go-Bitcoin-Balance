@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const explorer = "http://btc.blockr.io/api/v1/address/info/"
+const explorer = "https://blockchain.info/rawaddr/"
 
 type Response struct {
 	Status  string       `json:"status"`
@@ -24,10 +24,10 @@ type Response struct {
 type ResponseData struct {
 	Address         string           `json:"address"`
 	IsKnown         bool             `json:"is_unknown"`
-	Balance         float64          `json:"balance"`
+	Balance         float64          `json:"final_balance"`
 	BalanceMultiSig float64          `json:"balance_multisig"`
 	TotalRecieved   float64          `json:"totalreceived"`
-	NbTxs           float64          `json:"nb_txs"`
+	NbTxs           float64          `json:"n_tx"`
 	FirstTxs        ResponseFirstTxs `json:"first_tx"`
 	LastTxs         ResponseLastTxs  `json:"last_tx"`
 	IsValid         bool             `json:"is_valid"`
@@ -77,9 +77,9 @@ func FetchUrlByte(url string, user_agent string) []byte {
 	return body
 }
 
-func LoadJsonFromUrl(url string, user_agent string) Response {
+func LoadJsonFromUrl(url string, user_agent string) ResponseData {
 	body := FetchUrlByte(url, user_agent)
-	res := Response{}
+	res := ResponseData{}
 	err := json.Unmarshal(body, &res)
 	if err != nil {
 		log.Fatal("Unmarchal failed !\n", err)
@@ -122,7 +122,7 @@ func main() {
 	data := ReadFromFile(os.Args[1])
 	length := len(data) - 1
 	fmt.Printf("\t\tWe have %d addresses to check their balances\n\n", length)
-	fmt.Println("\tAddress\t\t\t \t\tBalance\t\t\tETA")
+	fmt.Println("\tAddress\t\t\t \t\tBalance\t\t\tTxs")
 	fmt.Println("----------------------------------\t---------------------\t\t-------------")
 
 	i, j := 0, 1
@@ -133,7 +133,7 @@ func main() {
 		} else {
 			url := explorer + value
 			res := LoadJsonFromUrl(url, user_agent)
-			fmt.Printf("\033[92m%s\033[0m\t\033[95m%.8f\tBTC\033[0m\t\tETA(%%): %.2f\n", res.Data.Address, res.Data.Balance, float64(j*100/length))
+			fmt.Printf("\033[92m%s\033[0m\t\033[95m%.8f\tBTC\033[0m\t\t%.0f\n", res.Address, res.Balance/100000000, float64(res.NbTxs))
 			if i == 5 {
 				time.Sleep(1000 * time.Millisecond) // Wait 1s in order to escape Blockr.io's API restriction
 				i = 0
