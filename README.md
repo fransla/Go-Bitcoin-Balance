@@ -1,5 +1,4 @@
 # Go-Bitcoin-Balance 
-[![Build Status](https://drone.io/github.com/Chiheb-Nexus/Go-Bitcoin-Balance/status.png)](https://drone.io/github.com/Chiheb-Nexus/Go-Bitcoin-Balance/latest)
 
 Check Bitcoin addresses balance using blockchain.info API and Golang
 
